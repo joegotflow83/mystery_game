@@ -4,14 +4,28 @@ import sys
 import os
 
 
-def gen_random_word():
+def begin():
+    # Player begins and chooses a difficutly
+    difficutly = input("Welcome to Mystery Word! (A knock off of hangman!) "
+                       "Choose your difficutly, [E]asy, [M]edium, [H]ard "
+                       "Typer the letter in the bracket. ").lower()
+    if difficutly == 'e':
+        secret_word = easy_word()
+        return gen_board(secret_word)
+
+
+def easy_word():
+    word = gen_random_word(4, 6)
+    return word
+
+def gen_random_word(min_letter, max_letter):
     # Generate the word from the words file on pc
     with open('/usr/share/dict/words') as f:
         # Normalize text and pick work
         text = f.read()
         tokenizer = RegexpTokenizer(r'\w+')
         content = tokenizer.tokenize(text)
-        words = [word.lower() for word in content]
+        words = [word.lower() for word in content if min_letter <= len(word) <= max_letter]
         word = random.choice(words)
         return word
 
@@ -22,9 +36,8 @@ def clear():
     else:
         os.system('clear')
         
-def gen_board():
+def gen_board(secret_word):
     # Generate board 
-    secret_word = gen_random_word()
     good_guesses = list(secret_word)
     bad_guesses = []
     board = len(good_guesses) * '_'
@@ -36,15 +49,9 @@ def gen_board():
     
 def guess(secret_word, good_guesses, bad_guesses, board):
     # Allow player to guess
-    while len(bad_guesses) < 9:
-        bad_guesses = ''.join(bad_guesses)
-        print("Strikes {}/10             {}".format(len(bad_guesses), (bad_guesses + ' ')))
-        bad_guesses = list(bad_guesses)
-        print(secret_word)
-        guess = input("Guess a letter ")
-        if guess == 'Q':
-            return exit()
-        elif guess in good_guesses:
+    while len(bad_guesses) < 7:
+        guess = display(bad_guesses)
+        if guess in good_guesses:
             board = list(board)
             for index, letter in enumerate(secret_word):
                 if letter == guess:
@@ -57,23 +64,45 @@ def guess(secret_word, good_guesses, bad_guesses, board):
             else:
                 print(board)
         elif not guess.isalpha():
-            not_letter()
+            not_letter(board)
+        elif len(guess) != 1:
+            too_many_letters(board)
         elif guess in bad_guesses:
-            print("You have already tried that letter! Try a different letter. \n")
-            print(board)
+            same_guess(board)
         else:
-            bad_guesses.append(guess)
-            bad_guesses = ''.join(bad_guesses)
-            clear()
-            print(board)
-            bad_guesses = list(bad_guesses)
+            add_bad_guess(guess, bad_guesses, board)
     else:
-        print("You lost! My secret word was {}".format(secret_word))
-        return play_again()  
+        player_loses(secret_word) 
+
+def display(bad_guesses):
+    # Display the board and bad guessed taken to the user
+    bad_guesses = ''.join(bad_guesses)
+    print("Strikes {}/10             {}\n".format(len(bad_guesses), (bad_guesses + ' ')))
+    bad_guesses = list(bad_guesses)
+    return input("Guess a letter ").lower()
+
+def add_bad_guess(guess, bad_guesses, board):
+    bad_guesses.append(guess)
+    bad_guesses = ''.join(bad_guesses)
+    clear()
+    print(board)
+    return board
+
+def same_guess(board):
+    print("You have already tried that letter! Try a different letter. \n")
+    print(board)
+    return board
 
 def not_letter(board):
     # Display message if input is not letter
     print("That is a not a letter! Please type a letter. \n")
+    print(board)
+    return board
+
+def too_many_letters(board):
+    # Display message user put more than one letter
+    print("You put more than one letter! Only put one letter \n")
+    print(board)
     return board
 
 def player_win(secret_word):
@@ -81,17 +110,17 @@ def player_win(secret_word):
     print("You win! The secret word was {}".format(secret_word))
     return play_again()
 
-def exit():
-    # Exit game
-    print("Thanks for playing!")
-    return sys.exit()
+def player_loses(secret_word):
+    # Player loses
+    print("You lost! My secret word was {}".format(secret_word))
+    return play_again() 
 
 def play_again():
     # Allow player to play again if so chooses     
     again = input("Play again? Y/n ").lower()
     if again != 'n':
-        return gen_board()
+        return begin()
     else:
         sys.exit()
-        
-gen_board()
+
+begin()
