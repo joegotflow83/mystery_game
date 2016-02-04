@@ -1,5 +1,6 @@
 from nltk.tokenize import RegexpTokenizer
 import random
+import math
 import sys
 import os
 
@@ -12,10 +13,24 @@ def begin():
     if difficutly == 'e':
         secret_word = easy_word()
         return gen_board(secret_word)
-
+    elif difficutly == 'm':
+        secret_word = medium_word()
+        return gen_board(secret_word)
+    elif difficutly == 'h':
+        secret_word = hard_word()
+        return gen_board(secret_word)
 
 def easy_word():
     word = gen_random_word(4, 6)
+    return word
+
+def medium_word():
+    word = gen_random_word(6, 10)
+    return word
+
+def hard_word():
+    infinity = math.inf
+    word = gen_random_word(10, infinity)
     return word
 
 def gen_random_word(min_letter, max_letter):
