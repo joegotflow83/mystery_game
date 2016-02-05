@@ -20,18 +20,17 @@ def gen_random_word():
         text = f.read()
         tokenizer = RegexpTokenizer(r'\w+')
         content = tokenizer.tokenize(text)
-        words = [word.lower() for word in content]
-        word = random.choice(words)
-        return word
+        words = [word.lower() for word in content if len(word) != 1]
+        return words
 
-def shuffle_word(letters, position):
+def shuffle_word(letters):
     # Shuffle the word to another word with same correct letters
     with open('/usr/share/dict/words') as f:
         # Normalize text and pick work
         text = f.read()
         tokenizer = RegexpTokenizer(r'\w+')
         content = tokenizer.tokenize(text)
-        words = [word.lower() for word in content if word in letters[position]]
+        words = [word.lower() for word in content if word in letters]
         word = random.choice(words)
         return word
 
@@ -92,6 +91,7 @@ def display(bad_guesses):
     return input("Guess a letter ").lower()
 
 def add_bad_guess(guess, bad_guesses, board):
+    # Add the bad guess to list of bad guesses
     bad_guesses.append(guess)
     bad_guesses = ''.join(bad_guesses)
     clear()
@@ -99,6 +99,7 @@ def add_bad_guess(guess, bad_guesses, board):
     return board
 
 def same_guess(board):
+    # Display message player has already used that word
     print("You have already tried that letter! Try a different letter. \n")
     print(board)
     return board
@@ -138,24 +139,19 @@ def play_again():
 
 
 
-
-
-
-
-test_words = ['dog', 'apple', 'banana', 'coconut', 'pear', 'peach', 'ukulele',
+'''['dog', 'apple', 'banana', 'coconut', 'pear', 'peach', 'ukulele',
               'milk', 'eggs', 'while', 'color', 'blue', 'red', 'green', 'purple',
               'man', 'woman', 'animal', 'thing', 'anaconda', 'alzheimers', 'and', 'allily',
-              'abomindiable']
+              'abomindiable']'''
 
 
 
 
-def new_secret_word():
+def evil():
     # Create new board and new word but include correct letters player has given
-    global test_words
+    test_words = gen_random_word()
     secret_word = random.choice(test_words)
     board = '_' * len(secret_word)
-    print(secret_word)
     print(board)
     guess = input('Guess ')
     new_list = [word for word in test_words if guess not in word]
@@ -164,7 +160,6 @@ def new_secret_word():
     secret_word = random.choice(new_list)
     board = '_' * len(secret_word)
     print("Wrong!")
-    print(secret_word)
     print(board)
     while guesses < 15:
         guess = input('Guess ')
@@ -174,11 +169,17 @@ def new_secret_word():
                 secret_word = random.choice(new_list)
                 board = '_' * len(secret_word)
                 print("Wrong!")
-                print(secret_word)
                 print(board)
+                guesses += 1
             except (ValueError, IndexError):
                 secret_word = secret_word
                 print("Correct!")
+                for index, letter in enumerate(secret_word):
+                    if letter == guess:
+                        board = list(board)
+                        board[index] = letter
+                        board = ''.join(board)
+                print(board)
                 while guesses < 15:
                     guess = input('Guess ')
                     if guess in secret_word:
@@ -186,20 +187,19 @@ def new_secret_word():
                             if letter == guess:
                                 board = list(board)
                                 board[index] = letter
-                                baord = ''.join(board)
+                                board = ''.join(board)
                         print(board)
                         if '_' not in board:
                             print("You win!")
                             return sys.exit()
                     else:
                         print("Wrong!")
+                        guesses += 1
         else:
             print("Wrong!")
-        
+            guesses += 1
 
-
-
-new_secret_word()
+evil()
 
 
 
