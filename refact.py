@@ -14,6 +14,7 @@ import sys
 import os
 
 import difficulty_settings
+from graphics import HangmanGraphics
 
 
 class Hangman:
@@ -44,6 +45,12 @@ class Hangman:
 		"""Have user guess a letter"""
 		print(self.display_info(self.blank_word))
 		guess = input("\nGuess a letter ")
+		if guess == '':
+			return self.nothing_guessed()
+		elif not guess.isalpha():
+			return self.not_letter()
+		elif guess in self.bad_guesses:
+			return self.same_letter_guess()
 		return [guess, self.blank_word]
 		
 	def check_try(self, guess, secret_word, bad_guesses, blank_word):
@@ -51,12 +58,6 @@ class Hangman:
 		good_guesses = list(self.secret_word)
 		if guess in good_guesses:
 			return self.correct_guess(guess, self.secret_word, self.blank_word)
-		elif guess == '':
-			return self.nothing_guessed()
-		elif not guess.isalpha():
-			return self.not_letter()
-		elif guess in self.bad_guesses:
-			return self.same_letter_guess()
 		elif guess not in good_guesses:
 			return self.incorrect_guess(self.bad_guesses, guess)
 
@@ -66,7 +67,6 @@ class Hangman:
 		print("You guessed a correct letter!")
 		self.blank_word = list(self.blank_word)
 		self.blank_word = self.place_correct_letter(guess, self.secret_word, self.blank_word)
-		#self.blank_word = ''.join(self.blank_word)
 		return self.blank_word
 
 	def place_correct_letter(self, guess, secret_word, blank_word):
@@ -74,6 +74,7 @@ class Hangman:
 		for index, letter in enumerate(self.secret_word):
 			if letter == guess:
 				self.blank_word[index] = guess
+		self.blank_word = ''.join(self.blank_word)
 		if '_' not in self.blank_word:
 			return self.game_over_win(self.secret_word)
 		else:
@@ -108,7 +109,7 @@ class Hangman:
 	def game_over_win(self, secret_word):
 		"""The game is over and the player won"""
 		print("You won the game! The word was {}".format(self.secret_word))
-		return
+		return sys.exit()
 
 	def play_again(self):
 		"""Ask the player if they want to play again"""
@@ -118,14 +119,37 @@ class Hangman:
 		else:
 			return sys.exit()
 
-	def game_over_lose(self, secret_word):
+	def game_over_lose(self, secret_word, graphic):
 		"""The game is over and the player lost"""
+		print('{} \n'.format(graphic))
 		print("You lost! The secret_word was {}".format(self.secret_word))
 		return sys.exit()
+
+	def display_graphics(self, guesses):
+		"""Display the graphics of the hangman"""
+		if self.guesses == 0:
+			return HangmanGraphics.zero()
+		elif self.guesses == 1:
+			return HangmanGraphics.one()
+		elif self.guesses == 2:
+			return HangmanGraphics.two()
+		elif self.guesses == 3:
+			return HangmanGraphics.three()
+		elif self.guesses == 4:
+			return HangmanGraphics.four()
+		elif self.guesses == 5:
+			return HangmanGraphics.five()
+		elif self.guesses == 6:
+			return HangmanGraphics.six()
+		elif self.guesses == 7:
+			return HangmanGraphics.seven()
+		elif self.guesses == 8:
+			return HangmanGraphics.eight()
 
 	def display_info(self, blank_word):
 		"""Display blank word and guesses already picked"""
 		print("\nThe word is {} characters long\n".format(len(self.secret_word)))
+		print("                          {}\n".format(self.display_graphics(self.guesses)))
 		print("{}\n\n".format(self.blank_word))
 		for letter in self.bad_guesses:
 			print('{}'.format(letter), end=' ')
@@ -156,10 +180,10 @@ class Hangman:
 
 	def round(self):
 		"""Create a round of the game"""
-		while self.guesses < 7:
+		while self.guesses < 8:
 			self.play()
 		else:
-			return self.game_over_lose(self.secret_word)
+			return self.game_over_lose(self.secret_word, HangmanGraphics.eight())
 
 	def play(self):
 		"""Start the game"""
