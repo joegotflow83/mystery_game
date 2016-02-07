@@ -66,7 +66,7 @@ class Hangman:
 		print("You guessed a correct letter!")
 		self.blank_word = list(self.blank_word)
 		self.blank_word = self.place_correct_letter(guess, self.secret_word, self.blank_word)
-		self.blank_word = ''.join(self.blank_word)
+		#self.blank_word = ''.join(self.blank_word)
 		return self.blank_word
 
 	def place_correct_letter(self, guess, secret_word, blank_word):
@@ -108,25 +108,24 @@ class Hangman:
 	def game_over_win(self, secret_word):
 		"""The game is over and the player won"""
 		print("You won the game! The word was {}".format(self.secret_word))
-		return sys.exit()
+		return
 
-	'''def play_again(self):
+	def play_again(self):
 		"""Ask the player if they want to play again"""
 		again = input("Do you want to play again? Y/n ")
 		if again != 'n':
-			return player=input("What is your name player? "))
+			return self.setup()
 		else:
-			return sys.exit()'''
+			return sys.exit()
 
 	def game_over_lose(self, secret_word):
 		"""The game is over and the player lost"""
-		print("You lost! The secret_word was {}".format(secret_word))
+		print("You lost! The secret_word was {}".format(self.secret_word))
 		return sys.exit()
 
 	def display_info(self, blank_word):
 		"""Display blank word and guesses already picked"""
-		print("\nThe word is {} characters long\n".format(len(self.blank_word)))
-		print(self.secret_word)
+		print("\nThe word is {} characters long\n".format(len(self.secret_word)))
 		print("{}\n\n".format(self.blank_word))
 		for letter in self.bad_guesses:
 			print('{}'.format(letter), end=' ')
@@ -138,8 +137,11 @@ class Hangman:
 		else:
 			return os.system('clear')
 
-	def setup(self, difficulty):
+	def setup(self):
 		"""Select which game environment to start up"""
+		difficulty = input("What difficulty do you want to play? "
+					   "[E]asy? [M]edium? or [H]ard? Pick a letter "
+					   "in the brackets. ").lower()
 		if difficulty == 'e':
 			game = difficulty_settings.EasyMode(player=input("What is your name player? "))
 			game.round()
@@ -157,19 +159,17 @@ class Hangman:
 		while self.guesses < 7:
 			self.play()
 		else:
-			self.game_over_lose(self.secret_word)
+			return self.game_over_lose(self.secret_word)
 
 	def play(self):
 		"""Start the game"""
 		user_guess = self.user_try()
-		right_or_wrong = self.check_try(user_guess[0], self.secret_word, self.bad_guesses, user_guess[1])
+		right_or_wrong = self.check_try(user_guess[0], self.secret_word, \
+										self.bad_guesses, user_guess[1])
 		return
 
 if __name__ == '__main__':
 	os.system('cls' if os.name == 'nt' else 'clear')
 	while True:
 		game = Hangman()
-		difficulty = input("What difficulty do you want to play? "
-					   "[E]asy? [M]edium? or [H]ard? Pick a letter "
-					   "in the brackets. ").lower()
-		game.setup(difficulty)
+		game.setup()

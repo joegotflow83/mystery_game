@@ -22,7 +22,7 @@ class MediumMode(Hangman):
 		self.guesses = 0
 		self.bad_guesses = []
 		self.secret_word = Hangman.gen_rand_word(self, 6, 10)
-		self.blank_word = Hangman.gen_blank_word(slef, self.secret_word)
+		self.blank_word = Hangman.gen_blank_word(self, self.secret_word)
 
 
 class HardMode(Hangman):
